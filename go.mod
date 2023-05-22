@@ -1,3 +1,3 @@
-module Nie-Mand/dfile
+module github.com/Nie-Mand/dfile
 
 go 1.20
