@@ -13,12 +13,14 @@ type Stage struct {
 		imageName string
 		version   string
 	}
-	run      []string
-	copy     []Pair
-	expose   []int
-	workDir  string
-	cmd      string
-	commands []TrackedCommand
+	run       []string
+	copy      []Pair
+	expose    []int
+	workDir   string
+	cmd       string
+	commands  []TrackedCommand
+	buildEnvs []Pair
+	envs      []Pair
 }
 
 func (stage *Stage) From(image string) {
@@ -57,9 +59,17 @@ func (stage *Stage) Copy(from string, to string) {
 	stage.commands = append(stage.commands, TrackedCommand{command: "copy", idx: len(stage.copy) - 1})
 }
 
-func (stage *Stage) GetCode() string {
+func (stage *Stage) SetBuildEnv(key string, value string) {
+	stage.buildEnvs = append(stage.buildEnvs, Pair{first: key, second: value})
+}
+
+func (stage *Stage) SetEnv(key string, value string) {
+	stage.envs = append(stage.envs, Pair{first: key, second: value})
+}
+
+func (stage *Stage) GetCode() (string, error) {
 	if stage.from.imageName == "" {
-		panic("You did not specify a Base Image")
+		return "", fmt.Errorf("You did not specify a Base Image")
 	}
 
 	statements := Statements{}
@@ -67,6 +77,24 @@ func (stage *Stage) GetCode() string {
 
 	if stage.workDir != "" {
 		statements.AddStatement("WORKDIR", stage.workDir)
+	}
+
+	for _, env := range stage.buildEnvs {
+		if env.second == "" {
+			statements.AddStatement("ARG", env.first)
+		} else {
+			statements.AddStatement("ARG", env.first+"="+env.second)
+		}
+	}
+
+	for _, env := range stage.envs {
+		if env.second == "" {
+			statements.AddStatement("ARG", env.first)
+			
+		} else {
+			statements.AddStatement("ARG", env.first+"="+env.second)
+		}
+		statements.AddStatement("ENV", env.first+"=$"+env.first)
 	}
 
 	for _, command := range stage.commands {
@@ -78,7 +106,7 @@ func (stage *Stage) GetCode() string {
 			to := stage.copy[command.idx].second
 			statements.AddStatement("COPY", from, to)
 		} else {
-			panic("Unrecognized Command")
+			return "", fmt.Errorf("Unrecognized Command")
 		}
 	}
 
@@ -92,5 +120,5 @@ func (stage *Stage) GetCode() string {
 		statements.AddStatement("CMD", "["+cmd+"]")
 	}
 
-	return strings.Join(statements.instructions, "\n\n")
+	return strings.Join(statements.instructions, "\n\n"), nil
 }

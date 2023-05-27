@@ -15,10 +15,13 @@ func main() {
 		WorkDir("/app").
 		Copy("package.json", ".").
 		Copy("package-lock.json", ".").
-		Run("npm ci").Copy(".", ".").
+		Run("npm ci").
+		Copy(".", ".").
+		BuildEnvs("NODE_ENV", "production").
+		Envs("PORT", "3000").
+		Envs("API_URL", "").
 		Run("npm run build")
 
-	
 	dockerfile.NextStage()
 
 	dockerfile.
@@ -27,5 +30,10 @@ func main() {
 		Cmd("nginx -g daemon off;").
 		Expose(80)
 
-	dockerfile.Save()
+	err := dockerfile.Save()
+	if err != nil {
+		panic(err)
+	} else {
+		println("Dockerfile generated successfully!")
+	}
 }

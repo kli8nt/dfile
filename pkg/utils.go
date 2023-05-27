@@ -20,12 +20,6 @@ func (statement *Statements) AddStatement(chunks ...string) {
 	statement.instructions = append(statement.instructions, strings.Join(chunks, " "))
 }
 
-func resolve(e error) {
-	if e != nil {
-		panic(e)
-	}
-}
-
 func wrapInQuotes(s string) string {
 	return "\"" + s +"\""
 }

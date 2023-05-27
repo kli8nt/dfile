@@ -5,8 +5,6 @@ import (
 	"strings"
 )
 
-// multistage*
-
 type Dockerfile struct {
 	name string
 	stages []Stage
@@ -71,26 +69,48 @@ func (df *Dockerfile) Copy(from string, to string) (*Dockerfile) {
 	return df
 }
 
-func (df *Dockerfile) GetCode() string {
-	stages := make([]string, 0)
-	for _, stage := range df.stages {
-		stages = append(stages, stage.GetCode())
-	}
-
-	return strings.Join(stages, "\n\n")
+func (df *Dockerfile) BuildEnvs(k string, v string) (*Dockerfile) {
+	df.stages[df.currentStage].SetBuildEnv(k, v)
+	return df
 }
 
-func (df *Dockerfile) Save() {
-	f, err := os.Create(df.GetFilename())
+func (df *Dockerfile) Envs(k string, v string) (*Dockerfile) {
+	df.stages[df.currentStage].SetEnv(k, v)
+	return df
+}
 
-	resolve(err)
+func (df *Dockerfile) GetCode() (string, error) {
+	stages := make([]string, 0)
+	for _, stage := range df.stages {
+		code, err := stage.GetCode()
+		if err != nil {
+			return "", err
+		}
+		stages = append(stages, code)
+	}
+
+	return strings.Join(stages, "\n\n"), nil
+}
+
+func (df *Dockerfile) Save() error {
+	f, err := os.Create(df.GetFilename())
+	if err != nil {
+		return err
+	}
 
 	defer f.Close()
 
-	content := df.GetCode()
+	content, err := df.GetCode()
+	if err != nil {
+		return err
+	}
+	
 	_, err = f.WriteString(content)
-
-	resolve(err)
+	if err != nil {
+		return err
+	}
+	
+	return nil
 }
 
 
