@@ -6,8 +6,8 @@ import (
 )
 
 type Dockerfile struct {
-	name string
-	stages []Stage
+	name         string
+	stages       []Stage
 	currentStage int
 }
 
@@ -23,58 +23,63 @@ func (df *Dockerfile) NextStage() {
 
 func (df *Dockerfile) GetFilename() string {
 	if df.name != "" {
-		return df.name + ".Dockerfile"
+		return df.name
 	}
 
 	return "Dockerfile"
 }
 
-func (df *Dockerfile) From(image string) (*Dockerfile) {
+func (df *Dockerfile) SetFilename(name string) {
+	df.name = name
+
+}
+
+func (df *Dockerfile) From(image string) *Dockerfile {
 	df.stages[df.currentStage].From(image)
 	return df
 }
 
-func (df *Dockerfile) ImageAlias(as string) (*Dockerfile) {
+func (df *Dockerfile) ImageAlias(as string) *Dockerfile {
 	df.stages[df.currentStage].ImageAlias(as)
 	return df
 }
 
-func (df *Dockerfile) ImageVersion(version string) (*Dockerfile) {
+func (df *Dockerfile) ImageVersion(version string) *Dockerfile {
 	df.stages[df.currentStage].ImageVersion(version)
 	return df
 }
 
-func (df *Dockerfile) WorkDir(workDir string) (*Dockerfile) {
+func (df *Dockerfile) WorkDir(workDir string) *Dockerfile {
 	df.stages[df.currentStage].WorkDir(workDir)
 	return df
 }
 
-func (df *Dockerfile) Cmd(cmd string) (*Dockerfile) {
+func (df *Dockerfile) Cmd(cmd string) *Dockerfile {
 	df.stages[df.currentStage].Cmd(cmd)
 	return df
 }
 
-func (df *Dockerfile) Expose(port int) (*Dockerfile) {
+func (df *Dockerfile) Expose(port int) *Dockerfile {
 	df.stages[df.currentStage].Expose(port)
 	return df
 }
 
-func (df *Dockerfile) Run(cmd string) (*Dockerfile) {
+func (df *Dockerfile) Run(cmd string) *Dockerfile {
 	df.stages[df.currentStage].Run(cmd)
 	return df
 }
 
-func (df *Dockerfile) Copy(from string, to string) (*Dockerfile) {
+func (df *Dockerfile) Copy(from string, to string) *Dockerfile {
 	df.stages[df.currentStage].Copy(from, to)
 	return df
 }
 
-func (df *Dockerfile) BuildEnvs(k string, v string) (*Dockerfile) {
+func (df *Dockerfile) BuildEnvs(k string, v string) *Dockerfile {
 	df.stages[df.currentStage].SetBuildEnv(k, v)
 	return df
 }
 
-func (df *Dockerfile) Envs(k string, v string) (*Dockerfile) {
+func (df *Dockerfile) Envs(k string, v string) *Dockerfile {
 	df.stages[df.currentStage].SetEnv(k, v)
 	return df
 }
@@ -104,13 +109,11 @@ func (df *Dockerfile) Save() error {
 	if err != nil {
 		return err
 	}
-	
+
 	_, err = f.WriteString(content)
 	if err != nil {
 		return err
 	}
-	
+
 	return nil
 }
-
-
