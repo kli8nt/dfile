@@ -17,7 +17,7 @@ type Stage struct {
 	copy      []Pair
 	expose    []int
 	workDir   string
-	cmd       string
+	cmd       []string
 	commands  []TrackedCommand
 	buildEnvs []Pair
 	envs      []Pair
@@ -41,7 +41,7 @@ func (stage *Stage) WorkDir(workDir string) {
 	stage.workDir = workDir
 }
 
-func (stage *Stage) Cmd(cmd string) {
+func (stage *Stage) Cmd(cmd []string) {
 	stage.cmd = cmd
 }
 
@@ -114,8 +114,8 @@ func (stage *Stage) GetCode() (string, error) {
 		statements.AddStatement("EXPOSE", fmt.Sprintf("%d", port))
 	}
 
-	if stage.cmd != "" {
-		splittedCmd := map2(strings.Split(stage.cmd, " "), wrapInQuotes)
+	if len(stage.cmd) != 1 {
+		splittedCmd := map2(stage.cmd, wrapInQuotes)
 		cmd := strings.Join(splittedCmd, ", ")
 		statements.AddStatement("CMD", "["+cmd+"]")
 	}

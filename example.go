@@ -27,7 +27,7 @@ func main() {
 	dockerfile.
 		From("nginx").
 		Copy("/dist", "/usr/share/nginx/html").
-		Cmd("nginx -g daemon off;").
+		Cmd("nginx", "-g", "daemon off;").
 		Expose(80)
 
 	err := dockerfile.Save()

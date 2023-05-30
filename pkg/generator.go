@@ -49,7 +49,7 @@ func (df *Dockerfile) WorkDir(workDir string) (*Dockerfile) {
 	return df
 }
 
-func (df *Dockerfile) Cmd(cmd string) (*Dockerfile) {
+func (df *Dockerfile) Cmd(cmd ...string) (*Dockerfile) {
 	df.stages[df.currentStage].Cmd(cmd)
 	return df
 }
