@@ -114,7 +114,7 @@ func (stage *Stage) GetCode() (string, error) {
 		statements.AddStatement("EXPOSE", fmt.Sprintf("%d", port))
 	}
 
-	if len(stage.cmd) != 1 {
+	if len(stage.cmd) != 0 {
 		splittedCmd := map2(stage.cmd, wrapInQuotes)
 		cmd := strings.Join(splittedCmd, ", ")
 		statements.AddStatement("CMD", "["+cmd+"]")
