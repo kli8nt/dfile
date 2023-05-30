@@ -7,7 +7,7 @@ import (
 func main() {
 	dockerfile := pkg.Dockerfile{}
 	dockerfile.Init()
-
+	dockerfile.SetFilename("Dockerfile")
 	dockerfile.
 		From("node").
 		ImageVersion("16").
