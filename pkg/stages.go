@@ -100,6 +100,9 @@ func (stage *Stage) GetCode() (string, error) {
 	for _, command := range stage.commands {
 		if command.command == "run" && len(stage.run) > command.idx {
 			instruction := stage.run[command.idx]
+			if instruction == "" {
+				continue
+			}
 			statements.AddStatement("RUN", instruction)
 		} else if command.command == "copy" && len(stage.copy) > command.idx {
 			from := stage.copy[command.idx].first
