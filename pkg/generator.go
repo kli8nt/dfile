@@ -59,6 +59,11 @@ func (df *Dockerfile) Cmd(cmd ...string) (*Dockerfile) {
 	return df
 }
 
+func (df *Dockerfile) CmdIgnoreSpace(cmd string) (*Dockerfile) {
+	df.stages[df.currentStage].Cmd(strings.Split(cmd, " "))
+	return df
+}
+
 func (df *Dockerfile) Expose(port int) *Dockerfile {
 	df.stages[df.currentStage].Expose(port)
 	return df
